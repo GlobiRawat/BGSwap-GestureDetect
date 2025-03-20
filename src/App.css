@@ -1,18 +1,178 @@
+body {
+  background: linear-gradient(135deg, #ffdde1, #ee9ca7, #ff99cc); /* Soft pink gradient */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column; /* Stack elements vertically */
+  justify-content: flex-start; /* Navbar stays at the top */
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+}
+
+.container {
+  margin-top: 80px; /* Ensure content starts below the navbar */
+  text-align: center;
+  padding: 10px;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 20px rgba(255, 77, 166, 0.3);
+  max-width: 90%;
+  width: 600px;
+  margin-top:6rem;
+}
+
+.start-button-container {
+  display: flex;
+  justify-content: center; /* Centers the button */
+  margin-top: 200px; /* Space from other elements */
+}
+
+.start-button {
+  background: linear-gradient(135deg, #ff4da6, #ff1a75); /* Vibrant pink gradient */
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  box-shadow: 0 6px 12px rgba(255, 26, 117, 0.3); /* Soft glow effect */
+}
+
+.start-button:hover {
+  background: linear-gradient(135deg, #ff3385, #e6005c); /* Darker pink on hover */
+  transform: scale(1.08); /* Slightly enlarge */
+  box-shadow: 0 8px 16px rgba(230, 0, 92, 0.4); /* Stronger glow effect */
+}
+
+.start-button:active {
+  transform: scale(0.96); /* Shrink slightly when clicked */
+  background: linear-gradient(135deg, #ff1a75, #cc0052); /* Even darker pink */
+}
+
+/* Ensure only one frame is visible at a time */
+.webcam-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 80%; /* Reduce overall width */
+  max-width: 500px; /* Limit the max width */
+  height: auto;
+  margin: auto; /* Center horizontally */
+  border-radius: 20px; /* Rounded border */
+  overflow: hidden;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+  background: #ff1a75;
+  margin-top: 1rem;
+}
+
+.webcam {
+  display: block;
+  width: 100%; /* Make it fit within the container */
+  height: auto;
+  border-radius: 20px; /* Matches the container’s border-radius */
+}
+
+.canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px; /* Ensure it matches the webcam frame */
+}
+
+
+.countdown {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 3rem;
+  font-weight: bold;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 10px;
+}
+
+.captured-image {
+  display: none;
+  width: 100%;
+  max-width: 640px;
+  margin: auto;
+}
+
+.captured-image.visible {
+  display: block;
+}
+
+/* Hide webcam when an image is captured */
+.webcam-container.hidden {
+  display: none;
+}
+
 .bg-selector {
   display: flex;
-  gap: 10px;
-  margin-top: 20px;
+  justify-content: center; /* Center the background thumbnails */
+  gap: 15px; /* Add spacing between thumbnails */
+  margin-top: 20px; /* Add space from the top */
 }
 
 .bg-thumbnail {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border: 2px solid transparent;
+  width: 80px; /* Adjust thumbnail size */
+  height: 50px;
+  border-radius: 10px; /* Rounded corners */
   cursor: pointer;
-  transition: border-color 0.3s;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth hover effect */
+  object-fit: cover; /* Ensures proper image scaling */
+  border: 2px solid transparent; /* Default border */
 }
 
 .bg-thumbnail:hover {
-  border-color: #007bff;
+  transform: scale(1.1); /* Slightly enlarge on hover */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3); /* Add a shadow effect */
+}
+
+.bg-thumbnail:active,
+.bg-thumbnail.selected {
+  border: 2px solid #ff1a75; /* Highlight selected background */
+}
+
+/* Style all buttons inside captured-buttons div */
+.captured-buttons {
+  display: flex;
+  justify-content: center; /* Center align buttons */
+  gap: 20px; /* Add space between buttons */
+  margin-top: 15px; /* Space above buttons */
+}
+
+.captured-buttons button {
+  background-color: #ff4da6; /* Vibrant pink */
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 10px rgba(255, 77, 166, 0.3); /* Soft glow effect */
+}
+
+.captured-buttons button:hover {
+  background-color: #ff3385; /* Darker pink on hover */
+  transform: scale(1.08); /* Slightly enlarge */
+  box-shadow: 0 6px 12px rgba(255, 51, 133, 0.4); /* Glow effect */
+}
+
+.captured-buttons button:active {
+  transform: scale(0.96); /* Shrink slightly when clicked */
+  background-color: #ff1a75; /* Even darker pink */
+}
+
+.loading-page .navbar {
+  display: none;
 }

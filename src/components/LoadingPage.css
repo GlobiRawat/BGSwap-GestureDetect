@@ -1,0 +1,57 @@
+.loading-page {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  text-align: center;
+  color: white;
+  font-family: "Poppins", sans-serif;
+}
+
+.loading-container {
+  background: rgba(255, 255, 255, 0.2); /* Frosted-glass effect */
+  padding: 30px;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0px 4px 20px rgba(255, 51, 133, 0.4);
+  max-width: 500px;
+  width: 90%;
+}
+
+.loading-title {
+  font-size: 32px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.loading-description {
+  font-size: 18px;
+  opacity: 0.9;
+  margin-bottom: 20px;
+}
+
+.enter-button {
+  background-color: #ff4da6; /* Vibrant pink */
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  font-size: 18px;
+  font-weight: bold;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  box-shadow: 0px 4px 10px rgba(255, 77, 166, 0.4);
+}
+
+.enter-button:hover {
+  background-color: #ff3385; /* Darker pink */
+  transform: scale(1.08);
+  box-shadow: 0px 6px 12px rgba(255, 51, 133, 0.5);
+}
+
+.enter-button:active {
+  transform: scale(0.96);
+  background-color: #ff1a75;
+}

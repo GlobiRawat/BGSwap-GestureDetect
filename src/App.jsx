@@ -8,6 +8,8 @@ import Webcam from "react-webcam";
 import bg1 from "./assets/bg1.jpeg";
 import bg2 from "./assets/bg2.jpeg";
 import bg3 from "./assets/bg3.jpeg";
+import LoadingPage from "./components/LoadingPage"; // Import LoadingPage component
+import Navbar from './components/Navbar/navbar';
 import "./App.css";
 
 const App = () => {
@@ -26,7 +28,10 @@ const App = () => {
     const isWebcamVisible = useRef(true);
     const isCountingDown = useRef(false);
     const isCaptureAllowed = useRef(false);
-    const lastProcessedFrame = useRef(null);  // Store the last processed frame during countdown
+    const lastProcessedFrame = useRef(null); // Store the last processed frame during countdown
+    const [isCameraStarted, setIsCameraStarted] = useState(false);
+    const [setIsLoading] = useState(true);  // State for loading page
+    const [isAppReady, setIsAppReady] = useState(false);  // State to control when the app is ready
 
     useEffect(() => {
         backgroundImageRef.current.src = selectedBg;
@@ -45,6 +50,7 @@ const App = () => {
                 outputCategoryMask: true,
             });
             setImageSegmenter(segmenter);
+            setIsLoading(false);  // Stop loading once models are ready
         };
         loadModels();
 
@@ -64,22 +70,31 @@ const App = () => {
     const startWebcam = async () => {
         try {
             const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            webcamRef.current.srcObject = stream;
-            cameraRef.current = new cam.Camera(webcamRef.current.video, {
-                onFrame: async () => {
-                    if (imageSegmenter && !isCapturing.current  && isWebcamVisible.current) {
-                        await processFrame();
-                    }
-                    if (handsRef.current) await handsRef.current.send({ image: webcamRef.current.video });
-                },
-                width: 640,
-                height: 480,
-            });
-            cameraRef.current.start();
+    
+            if (webcamRef.current) {
+                webcamRef.current.srcObject = stream;
+            }
+    
+            if (webcamRef.current && webcamRef.current.video) {
+                cameraRef.current = new cam.Camera(webcamRef.current.video, {
+                    onFrame: async () => {
+                        if (imageSegmenter && !isCapturing.current && isWebcamVisible.current) {
+                            await processFrame();
+                        }
+                        if (handsRef.current) await handsRef.current.send({ image: webcamRef.current.video });
+                    },
+                    width: 640,
+                    height: 480,
+                });
+    
+                cameraRef.current.start();
+                setIsCameraStarted(true);
+            }
         } catch (error) {
             console.error("Error accessing webcam: ", error);
         }
     };
+    
 
     const processFrame = async () => {
         if (!webcamRef.current || !webcamRef.current.video || !imageSegmenter || !canvasRef.current) return;
@@ -168,15 +183,29 @@ const App = () => {
     };
 
     const captureImage = () => {
-        if (!isCaptureAllowed.current || !lastProcessedFrame.current) return;
-
-        setCapturedImage(lastProcessedFrame.current); // Capture the last processed frame after countdown
+        if (!isCaptureAllowed.current || !canvasRef.current) return;
+    
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const videoCanvas = canvasRef.current;
+    
+        canvas.width = videoCanvas.width;
+        canvas.height = videoCanvas.height;
+    
+        // Draw background first
+        ctx.drawImage(backgroundImageRef.current, 0, 0, canvas.width, canvas.height);
+        
+        // Draw the segmented person
+        ctx.drawImage(videoCanvas, 0, 0);
+        
+        setCapturedImage(canvas.toDataURL("image/png"));
         isCapturing.current = true;
         isCaptureAllowed.current = false;
         isCountingDown.current = false;
-        isWebcamVisible.current = false; // Hide webcam feed
-        isDrawing.current = false; // Stop drawing during capture
+        isWebcamVisible.current = false;
+        isDrawing.current = false;
     };
+    
 
     const resetCapture = () => {
         setCapturedImage(null);
@@ -187,6 +216,7 @@ const App = () => {
         isCountingDown.current=false;
         lastProcessedFrame.current = null; // Clear last frame after reset
     };
+
     const downloadImage = () => {
       if (!capturedImage) return;
       
@@ -196,28 +226,57 @@ const App = () => {
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-  };
-  
+    };
+
+    const handleEnter = () => {
+        setIsAppReady(true); // Show the app content
+    };
+    
     return (
-        <div className="container">
-            <button onClick={startWebcam}>Start Camera</button>
-            <Webcam ref={webcamRef} style={{ display: "none" }} />
-            <canvas ref={canvasRef} className="canvas" />
-            <div className="bg-selector">
-                <img src={bg1} alt="Background 1" className="bg-thumbnail" onClick={() => setSelectedBg(bg1)} />
-                <img src={bg2} alt="Background 2" className="bg-thumbnail" onClick={() => setSelectedBg(bg2)} />
-                <img src={bg3} alt="Background 3" className="bg-thumbnail" onClick={() => setSelectedBg(bg3)} />
-            </div>
-            {countdown !== null && <div className="countdown">{countdown}</div>}
-            {capturedImage && (
-                <div>
-                    <button onClick={resetCapture}>Retake</button>
-                    <button onClick={downloadImage}>Download</button>
+    <>
+        {isAppReady && <Navbar />}
 
+        {!isAppReady ? (
+            <LoadingPage onEnter={handleEnter} />
+        ) : (
+            <div className="container">
+                <div className="bg-selector">
+                    <img src={bg1} alt="Background 1" className="bg-thumbnail" onClick={() => setSelectedBg(bg1)} />
+                    <img src={bg2} alt="Background 2" className="bg-thumbnail" onClick={() => setSelectedBg(bg2)} />
+                    <img src={bg3} alt="Background 3" className="bg-thumbnail" onClick={() => setSelectedBg(bg3)} />
                 </div>
-            )}
-        </div>
-    );
-};
 
+                <div className="webcam-container" style={{ display: isCameraStarted ? "block" : "none" }}>
+                    <Webcam ref={webcamRef} className="webcam" />
+                    <canvas ref={canvasRef} className="canvas" />
+                    {countdown !== null && <div className="countdown">{countdown}</div>}
+                </div>
+
+                {!isCameraStarted && (
+                    <div className="start-button-container">
+                        <button onClick={startWebcam} className="start-button">Start Camera</button>
+                    </div>
+                )}
+
+                {capturedImage && (
+                    <div className="captured-buttons">
+                        <button onClick={resetCapture}>Retake</button>
+                        <button onClick={() => {
+    const link = document.createElement("a");
+    link.href = capturedImage;
+    link.download = "captured_image_with_bg.png";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}}>
+    Download
+</button>
+
+                    </div>
+                )}
+            </div>
+        )}
+    </>
+);
+};
 export default App;
